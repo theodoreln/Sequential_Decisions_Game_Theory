@@ -1,0 +1,14 @@
+Kenysian Beauty Contest : 
+    - https://www.youtube.com/watch?v=j8ZVkVjDPxo&ab_channel=IntermittentDiversion
+    - https://en.wikipedia.org/wiki/Keynesian_beauty_contest
+    - Notion of Focal Point
+
+Public Good Games and Tragedy of the common :
+    - https://www.youtube.com/watch?v=kw9shrf-6U4&ab_channel=SystemsInnovation
+    - Public Games are non excludable so tentation to become a freerider and enjoy the good without contributing
+    - Nash Equilibrium : 0 contribution by all but not observed in reality
+    - Tragedy of the common when people fall into social trap, they think very low term and because of diminishing return might end up in a situation with lower return (ex: pollution)
+
+Stag Hunt :
+    - https://en.wikipedia.org/wiki/Stag_hunt
+    - Prisonner's dilemma with two Nash Equilibrium
