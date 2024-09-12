@@ -1,4 +1,4 @@
-############## Optimization in full foresight ##############
+############## Deterministic optimization ##############
 
 using JuMP, Gurobi, Plots
 
@@ -64,3 +64,6 @@ plot!(p, time, education, label="Education", marker=:cross)
 
 # Display the plot
 display(p)
+
+### Comments ###
+# Non linearity constraint in the constraint of the transition function
