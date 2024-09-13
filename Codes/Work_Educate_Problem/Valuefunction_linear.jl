@@ -1,6 +1,7 @@
 ############## Value function linear programming ##############
 
 using JuMP, Gurobi, Plots
+gr()
 
 ### Parameters 
 # Numbers of periods
@@ -88,6 +89,22 @@ JuMP.optimize!(model)
 Valuefunction = value.(V)
 Qfunction = value.(Q)
 
+# Vector with best decision for every state in every time step, -1 if not reachable, 0 if study, 1 if work
+Best_Dec = zeros(n, length_education)
+for i = 1:n
+    for j = 1:length_education
+        if Qfunction[i, j, 1] >= Qfunction[i, j, 2]
+            Best_Dec[i, j] = 1
+        else
+            Best_Dec[i, j] = 0
+        end
+        real_education = education[j]
+        if real_education > base_education + 2 * (i - 1)
+            Best_Dec[i, j] = -1
+        end
+    end
+end
+
 # Giving the best decision for a given state
 function best_decision(time_step, education_step)
     indice = argmax(Qfunction[time_step, education_step, :])
@@ -105,6 +122,38 @@ function best_decision(time_step, education_step)
     end
 end
 
-for j = 1:length_education
-    best_decision(8, j)
+# Example matrix with three possible values (-1, 0, 1)
+matrix = Best_Dec
+
+# Initialize an empty plot
+p = plot(xlim=(0.5, size(matrix, 1) + 0.5), ylim=(0.5, size(matrix, 2) + 0.5),
+    ratio=:equal, legend=false, framestyle=:box, grid=true,
+    xlabel="Time", ylabel="Education level",
+    xticks=1:size(matrix, 1), yticks=0:size(matrix, 2),
+    xtickfont=font(4), ytickfont=font(4), title="Work / Study Decision")
+
+# Loop through the matrix and plot squares with appropriate colors and annotations
+for i in 1:size(matrix, 1)
+    for j in 1:size(matrix, 2)
+        value = matrix[i, j]
+        x = i  # Row -> x-axis
+        y = j  # Column -> y-axis
+
+        # Define color and text based on the value
+        if value == -1
+            rect = Shape(x .+ [-0.5, 0.5, 0.5, -0.5], y .+ [-0.5, -0.5, 0.5, 0.5])
+            plot!(rect, fillcolor=:grey, linecolor=:black, label="Irreachable")
+        elseif value == 0
+            rect = Shape(x .+ [-0.5, 0.5, 0.5, -0.5], y .+ [-0.5, -0.5, 0.5, 0.5])
+            plot!(rect, fillcolor=:green, linecolor=:black, label="Study")
+        elseif value == 1
+            rect = Shape(x .+ [-0.5, 0.5, 0.5, -0.5], y .+ [-0.5, -0.5, 0.5, 0.5])
+            plot!(rect, fillcolor=:blue, linecolor=:black, label="Work")
+        end
+    end
 end
+
+# Remove duplicate legend entries
+# plot!(legend=:bottomright)
+# Display the plot
+display(p)
