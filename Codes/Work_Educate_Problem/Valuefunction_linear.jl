@@ -17,7 +17,7 @@ expenses = 1
 # Max education
 max_education = base_education + n * 2
 # Discount factor
-gamma = 1
+gamma = 0.95
 
 # Probability function of arriving to stage x' with choosing action u in stage x
 function proba(edu_new, edu_now, dec_now)
@@ -53,20 +53,13 @@ function ret(edu_now, dec_now)
     return ((1 - dec_now) * (base_salary * (1 + edu_now / 2)) - expenses)
 end
 
-# # Decision possibilities over time (time in row)
-# Decision_pos = [0 1]
-# Decision_time = repeat(Decision_pos, n, 1)
-
-# # Education possibilities over time (time in row)
-# Education_pos = collect(0:n)'
-# Education_time = repeat(Education_pos, n, 1)
 
 # List of time
 time = collect(1:n)'
 # List of Education possibilities
 education = collect(base_education:max_education)'
 length_education = length(education)
-# List of Decision possibilities
+# List of Decision possibilities, 0 is working and 1 is studying
 decision = [0 1]
 
 # Model optimization
@@ -82,7 +75,7 @@ model = Model(Gurobi.Optimizer)
 @constraint(model, [j = 1:length_education, k = 1:2], V[n, j] >= ret(education[j], decision[k]))
 # Computation of Q
 @constraint(model, [i = 1:n-1, j = 1:length_education, k = 1:2], Q[i, j, k] == ret(education[j], decision[k]) + gamma * sum(proba(education[l], education[j], decision[k]) * V[i+1, l] for l = j:length_education))
-@constraint(model, [j = 1:length_education, k = 1:2], Q[n, j, k] >= ret(education[j], decision[k]))
+@constraint(model, [j = 1:length_education, k = 1:2], Q[n, j, k] == ret(education[j], decision[k]))
 
 JuMP.optimize!(model)
 
@@ -94,9 +87,9 @@ Best_Dec = zeros(n, length_education)
 for i = 1:n
     for j = 1:length_education
         if Qfunction[i, j, 1] >= Qfunction[i, j, 2]
-            Best_Dec[i, j] = 1
-        else
             Best_Dec[i, j] = 0
+        else
+            Best_Dec[i, j] = 1
         end
         real_education = education[j]
         if real_education > base_education + 2 * (i - 1)
@@ -126,27 +119,27 @@ end
 matrix = Best_Dec
 
 # Initialize an empty plot
-p = plot(xlim=(0.5, size(matrix, 1) + 0.5), ylim=(0.5, size(matrix, 2) + 0.5),
+p = plot(xlim=(0.5, n + 0.5), ylim=(base_education - 0.5, max_education + 0.5),
     ratio=:equal, legend=false, framestyle=:box, grid=true,
     xlabel="Time", ylabel="Education level",
-    xticks=1:size(matrix, 1), yticks=0:size(matrix, 2),
+    xticks=1:n, yticks=base_education:max_education,
     xtickfont=font(4), ytickfont=font(4), title="Work / Study Decision")
 
 # Loop through the matrix and plot squares with appropriate colors and annotations
-for i in 1:size(matrix, 1)
-    for j in 1:size(matrix, 2)
+for i in 1:n
+    for j in 1:length_education
         value = matrix[i, j]
         x = i  # Row -> x-axis
-        y = j  # Column -> y-axis
+        y = education[j]  # Column -> y-axis
 
         # Define color and text based on the value
         if value == -1
             rect = Shape(x .+ [-0.5, 0.5, 0.5, -0.5], y .+ [-0.5, -0.5, 0.5, 0.5])
             plot!(rect, fillcolor=:grey, linecolor=:black, label="Irreachable")
-        elseif value == 0
+        elseif value == 1
             rect = Shape(x .+ [-0.5, 0.5, 0.5, -0.5], y .+ [-0.5, -0.5, 0.5, 0.5])
             plot!(rect, fillcolor=:green, linecolor=:black, label="Study")
-        elseif value == 1
+        elseif value == 0
             rect = Shape(x .+ [-0.5, 0.5, 0.5, -0.5], y .+ [-0.5, -0.5, 0.5, 0.5])
             plot!(rect, fillcolor=:blue, linecolor=:black, label="Work")
         end

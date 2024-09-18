@@ -1,6 +1,8 @@
 import gurobipy as grb
 from gurobipy import GRB
 import numpy as np
+import matplotlib.pyplot as plt
+from matplotlib.colors import ListedColormap
 
 def transition(state, action):
     education_rate = 2
@@ -54,5 +56,27 @@ def policy_dynamic_programing():
     
     return V, policy
 
-#V, policy =policy_dynamic_programing()
-#print(V,policy)
+V, policy =policy_dynamic_programing()
+print(V,policy)
+
+
+# Plotting
+# Convert the 'work' and 'study' to numeric values (0 for 'work', 1 for 'study')
+numeric_policy = np.where(policy == 'work', 0, 1)
+
+# Create a color map (blue for 'work', green for 'study')
+cmap = ListedColormap(['blue', 'green'])
+
+# Plot the policy array as an image
+plt.imshow(numeric_policy, cmap=cmap, aspect='auto')
+# Invert the y-axis to display it in reverse order
+plt.gca().invert_yaxis()
+
+# Add labels, a color bar, and title
+plt.colorbar(ticks=[0, 1], label='Policy')
+plt.title('Policy: Work (Blue) vs Study (Green)')
+plt.xlabel('Periods')
+plt.ylabel('States')
+
+# Display the plot
+plt.show()
