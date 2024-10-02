@@ -6,7 +6,6 @@ import numpy as np
 import math
 import matplotlib.pyplot as plt
 import random
-import policy
 
 from Valuefunction_LP import Policy_LP
 from Value_iteration import Policy_Value_iteration
