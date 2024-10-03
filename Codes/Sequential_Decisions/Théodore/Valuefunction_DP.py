@@ -1,30 +1,20 @@
-############# Value iteration ##############
-
 import matplotlib.pyplot as plt
 from matplotlib.colors import ListedColormap
 import numpy as np
 
 # Function to take the best decision
-def Policy_Value_iteration(n,base_salary, base_education, expenses, education_rate, max_education, gamma, ret, proba) :
+def Policy_DP(n,base_salary, base_education, expenses, education_rate, max_education, gamma, ret, proba) :
     # Creating array V with random values
     V_array = np.random.uniform(0, ret(max_education, 0), (n,max_education+1-base_education))
 
     # Recursion to repeat computation of V
-    cond = 0
-    while cond != 1 :
-        V_new = np.zeros((n,max_education+1-base_education))
-        cond_sum = 0
-        for i in range(n-1, -1, -1) :
-            for j in range(max_education, -1, -1) :
-                if i == n-1 :
-                    V_new[i,j] = max([ret(j,0), ret(j,1)])
-                else :
-                    V_new[i,j] = max([ret(j,0) + gamma * sum([proba(l,j,0)*V_array[i+1,l] for l in range(j,min(max_education,j+2)+1)]), 
+    for i in range(n-1, -1, -1) :
+        for j in range(max_education, -1, -1) :
+            if i == n-1 :
+                V_array[i,j] = max([ret(j,0), ret(j,1)])
+            else :
+                V_array[i,j] = max([ret(j,0) + gamma * sum([proba(l,j,0)*V_array[i+1,l] for l in range(j,min(max_education,j+2)+1)]), 
                                     ret(j,1) + gamma * sum([proba(l,j,1)*V_array[i+1,l] for l in range(j,min(max_education,j+3)+1)])])
-                cond_sum += (V_array[i,j] - V_new[i,j])
-        V_array = V_new.copy()
-        if cond_sum == 0 :
-            cond = 1
 
     # Creating array Q and recursion to fill it
     Q_array = np.zeros((n,max_education+1-base_education,2))
@@ -110,5 +100,5 @@ if __name__ == "__main__":
         # Show the plot
         plt.show()
         
-    Best_dec = Policy_Value_iteration(n,base_salary, base_education, expenses, education_rate, max_education, gamma, ret, proba)
+    Best_dec = Policy_DP(n,base_salary, base_education, expenses, education_rate, max_education, gamma, ret, proba)
     Plotting(Best_dec)

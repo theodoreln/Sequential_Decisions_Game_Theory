@@ -8,6 +8,7 @@ import matplotlib.pyplot as plt
 import random
 
 from Valuefunction_LP import Policy_LP
+from Valuefunction_DP import Policy_DP
 from Value_iteration import Policy_Value_iteration
 from Policy_iteration import Policy_Policy_iteration
 
@@ -64,7 +65,7 @@ study = np.zeros(n)
 money[0] = base_money
 education[0] = base_education
 
-Best_dec = Policy_LP(n, base_salary, base_education, expenses, education_rate, max_education, gamma, ret, proba)
+Best_dec = Policy_DP(n, base_salary, base_education, expenses, education_rate, max_education, gamma, ret, proba)
 print(Best_dec)
 
 for period in range(n):
