@@ -7,10 +7,10 @@ from gurobipy import GRB
 numPlayers = 10
 players = [i for i in range(numPlayers)]
 base_salary = 10
-education_cost_coefficient = 20
-Budget = 0
-c = 10
-d = 1
+education_cost_coefficient = {0:8, 1:8, 2:8, 3:8, 4:8, 5:12, 6:8, 7:8, 8:8, 9:8}
+Budget = 100
+c = 1
+d = 0.1
 
 # Definition of base functions
 
@@ -48,9 +48,18 @@ def stackelberg():
                                name=f"Subsidy of player {i}"
                                ) for i in players}
     
-    # Set objective function
+    c = model.addVar(vtype = GRB.CONTINUOUS,
+                               lb = 0,
+                               ub = gb.GRB.INFINITY,
+                               name=f"minimum education"
+                               )
+    
+    # Set objective function maximize total education
     objective = gb.quicksum(education[i] for i in players)
     model.setObjective(objective, GRB.MAXIMIZE)
+    
+    # Set objective function maximize minimum education
+    # model.setObjective(c, GRB.MAXIMIZE)
     
     Budget_constraint = model.addConstr(gb.quicksum(subsidy[i] for i in players), 
                                             gb.GRB.LESS_EQUAL,
@@ -58,26 +67,25 @@ def stackelberg():
                                             name="Limit on budget"
                                             )
     
-    Slack_1_constraint = {i: model.addConstr(slack_1[i] * (education[i] - 1), 
+    Slack_1_constraint = {i: model.addQConstr(slack_1[i] * (education[i] - 1), 
                                             gb.GRB.EQUAL,
                                             0,
                                             name="Slack 1 constraint"
                                             ) for i in players}
     
-    Slack_2_constraint = {i: model.addConstr(slack_2[i] * (-education[i]), 
+    Slack_2_constraint = {i: model.addQConstr(slack_2[i] * (-education[i]), 
                                             gb.GRB.EQUAL,
                                             0,
                                             name="Slack 2 constraint"
                                             ) for i in players}
     
-    Lagrange_constraint = {i: model.addConstr((base_salary * (1-d) - (c-subsidy[i]))+slack_1[i]-slack_2[i], 
+    Lagrange_constraint = {i: model.addQConstr(-(base_salary * (1-d) - (education_cost_coefficient[i]-subsidy[i]))+slack_1[i]-slack_2[i], 
                                             gb.GRB.EQUAL,
                                             0,
                                             name="Lagrange constraint"
                                             ) for i in players}
     
-    
-    model.setParam('NonConvex', 2)
+    minimum_constraint = {i: model.addConstr(c, gb.GRB.LESS_EQUAL, education[i], name="Minimum education") for i in players}
     
     model.optimize()
     
