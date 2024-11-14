@@ -105,4 +105,4 @@ if __name__ == "__main__":
     # Find the alpha and beta values corresponding to the argmax
     alpha_sol = argmax // 20 * 0.5
     beta_sol = 0.05 + argmax % 20 * 0.05
-    print(f"Player {i+1} - Optimal alpha: {alpha_sol}, optimal beta: {beta_sol}")
+    print(f"Player {i+1} - Optimal alpha: {alpha_sol}, optimal beta: {beta_sol} - Profit : {profit[argmax // 20, argmax % 20]}")
