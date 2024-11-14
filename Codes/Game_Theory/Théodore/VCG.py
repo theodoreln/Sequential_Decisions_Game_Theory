@@ -21,7 +21,10 @@ def optimal_production_levels(alpha_bid: list, beta_bid: list):
     x = {i: model.addVar(vtype=GRB.CONTINUOUS, name=f"Production level of player {i}") for i in range(n)}
     
     # Set objective
-    model.setObjective(gb.quicksum(cost(i, x[i], alpha_bid, beta_bid) for i in range(n)), GRB.MAXIMIZE)
+    model.setObjective(gb.quicksum(cost(i, x[i], alpha_bid, beta_bid) for i in range(n)), GRB.MINIMIZE)
+    
+    # Add constraints
+    model.addConstr(gb.quicksum(x[i] for i in range(n)) == xD)
     
     # Optimize
     model.optimize()
@@ -57,13 +60,13 @@ def iterate_profit(i, alpha, beta, alpha_bid, beta_bid):
     for j in range(21):
         for k in range(20):
             alpha_bid[i] = j * 0.5
-            beta_bid[i] = -1 + k * 0.05
+            beta_bid[i] =  0.05 + k * 0.05
             profit[j, k] = Profit(i, alpha, beta, alpha_bid, beta_bid)
     
     # Plot this profit array in a 3D plot
     fig = plt.figure()
     ax = fig.add_subplot(111, projection='3d')
-    X, Y = np.meshgrid(np.arange(0, 10.5, 0.5), np.arange(-1, 0, 0.05))
+    X, Y = np.meshgrid(np.arange(0, 10.5, 0.5), np.arange(0.05, 1.05, 0.05))
     X, Y = X.T, Y.T  # Transpose to match the shape of profit
     ax.plot_surface(X, Y, profit, cmap='viridis')
     ax.set_xlabel('Alpha')
@@ -81,15 +84,23 @@ if __name__ == "__main__":
     # Alpha costs of the players
     alpha = np.array([5, 4, 6, 2])
     # Beta costs of the players
-    beta = np.array([-0.3, -0.5, -0.3, -0.1])
+    beta = np.array([0.3, 0.5, 0.3, 0.1])
     # Input alpha bids 
     alpha_bid = np.array([5, 4, 6, 2])
     # Input beta bids
-    beta_bid = np.array([-0.3, -0.5, -0.3, -0.1])
+    beta_bid = np.array([0.3, 0.5, 0.3, 0.1])
+    # Demand of the market
+    xD = 20
     
     # Compute the optimal production levels
     print(optimal_production_levels(alpha_bid, beta_bid))
     # Compute the profit of the player i
     print(Profit(0, alpha, beta, alpha_bid, beta_bid))
     # Show profit of player 0 with iterate_profit
-    print(iterate_profit(0, alpha, beta, alpha_bid, beta_bid))
+    profit = iterate_profit(0, alpha, beta, alpha_bid, beta_bid)
+    # Find argmax of the maximum in profit
+    argmax = np.argmax(profit)
+    # Find the alpha and beta values corresponding to the argmax
+    alpha_sol = argmax // 20 * 0.5
+    beta_sol = 0.05 + argmax % 20 * 0.05
+    print(f"Optimal alpha: {alpha_sol}, optimal beta: {beta_sol}")
