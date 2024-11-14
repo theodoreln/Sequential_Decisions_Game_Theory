@@ -91,16 +91,18 @@ if __name__ == "__main__":
     beta_bid = np.array([0.3, 0.5, 0.3, 0.1])
     # Demand of the market
     xD = 20
+    # Player i
+    i = 0
     
     # Compute the optimal production levels
     print(optimal_production_levels(alpha_bid, beta_bid))
     # Compute the profit of the player i
-    print(Profit(0, alpha, beta, alpha_bid, beta_bid))
+    print(Profit(i, alpha, beta, alpha_bid, beta_bid))
     # Show profit of player 0 with iterate_profit
-    profit = iterate_profit(0, alpha, beta, alpha_bid, beta_bid)
+    profit = iterate_profit(i, alpha, beta, alpha_bid, beta_bid)
     # Find argmax of the maximum in profit
     argmax = np.argmax(profit)
     # Find the alpha and beta values corresponding to the argmax
     alpha_sol = argmax // 20 * 0.5
     beta_sol = 0.05 + argmax % 20 * 0.05
-    print(f"Optimal alpha: {alpha_sol}, optimal beta: {beta_sol}")
+    print(f"Player {i+1} - Optimal alpha: {alpha_sol}, optimal beta: {beta_sol}")
