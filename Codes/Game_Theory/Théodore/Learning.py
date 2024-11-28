@@ -57,9 +57,22 @@ def calculate_highest_regret(player_id, historical_strategies, historical_payoff
         r = regret(player_id, e, historical_strategies, historical_payoffs)
         regrets.append(r)
     regrets = np.array(regrets)
-    highest_regret_index = np.argmax(regrets)
-    best_pure_strategy = education_values[highest_regret_index]
-    highest_regret = regrets[highest_regret_index]
+    
+    # Set negative regrets to 0
+    regrets[regrets < 0] = 0
+    
+    # Calculate probabilities proportional to the regrets
+    total_regret = np.sum(regrets)
+    if total_regret == 0:
+        probabilities = np.ones_like(regrets) / len(regrets)
+    else:
+        probabilities = regrets / total_regret
+    
+    # Choose an action based on the calculated probabilities
+    chosen_index = np.random.choice(len(education_values), p=probabilities)
+    best_pure_strategy = education_values[chosen_index]
+    highest_regret = regrets[chosen_index]
+    
     return best_pure_strategy, highest_regret
 
 def fictitious_play(player_id, historical_strategies, historical_payoffs):
@@ -68,6 +81,7 @@ def fictitious_play(player_id, historical_strategies, historical_payoffs):
     for t in range(historical_strategies.shape[0] - 1, -1, -1):
         most_chosen_strategies += historical_strategies[t, :]
     most_chosen_strategies /= historical_strategies.shape[0]
+    most_chosen_strategies = np.round(most_chosen_strategies * 10) / 10
     
     # Compute the best response to the most chosen strategies of other players
     best_response = 0
@@ -99,6 +113,17 @@ def fictitious_play(player_id, historical_strategies, historical_payoffs):
     avg_payoff_historical = discounted_sum_historical / historical_payoffs.shape[0]
     
     return best_response, avg_payoff_best_response - avg_payoff_historical
+
+def weight_function(player_id, historical_strategies, historical_payoffs, historical_weights):
+    # Action is chosen based on probabilities proportional to the weights
+    probabilities = historical_weights[-1, player_id, :] / np.sum(historical_weights[-1, player_id, :])
+    chosen_index = np.random.choice(len(education_values), p=probabilities)
+    best_pure_strategy = education_values[chosen_index]
+    
+    # Compute the regret of the chosen action
+    r = regret(player_id, best_pure_strategy, historical_strategies, historical_payoffs)
+    
+    return best_pure_strategy, r
     
 
 def learning_process(numPlayers, numIterations, type):
@@ -106,22 +131,28 @@ def learning_process(numPlayers, numIterations, type):
     historical_strategies = np.zeros((numIterations, numPlayers))
     historical_payoffs = np.zeros((numIterations, numPlayers))
     historical_regrets = np.zeros((numIterations, numPlayers))
+    historical_weights = np.zeros((numIterations, numPlayers, len(education_values)))
     
     for t in range(numIterations):
         print("Iteration", t)
         for i in range(numPlayers):
             if t < 10 :
                 historical_strategies[t, i] = constant_strategies[i]
-                historical_regrets[t, i] = 0  # No regret in the first iteration
+                historical_regrets[t, i] = 0  # No regret in the first iterations
+                historical_weights[t, i] = 1  # Equal weights in the first iterations
             else:
                 if type == "regret_matching":
                     best_strat, highest_reg= calculate_highest_regret(i, historical_strategies[:t, :], historical_payoffs[:t, :])
                 if type == "fictitious_play":
                     best_strat, highest_reg= fictitious_play(i, historical_strategies[:t, :], historical_payoffs[:t, :])
+                if type == "multiplicative_weights":
+                    best_strat, highest_reg= weight_function(i, historical_strategies[:t, :], historical_payoffs[:t, :], historical_weights[:t, :, :])
                 historical_strategies[t, i] = best_strat
                 historical_regrets[t, i] = highest_reg
         for i in range(numPlayers):
             historical_payoffs[t, i] = money(historical_strategies[t, i], calculate_average_education(historical_strategies[t, :]))
+            if type == "multiplicative_weights" and t >= 10 :
+                historical_weights[t, i, :] = historical_weights[t-1, i, :] + np.sqrt(historical_payoffs[t, i])
     
     return historical_strategies, historical_regrets
 
