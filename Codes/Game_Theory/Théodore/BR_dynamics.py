@@ -6,9 +6,9 @@ from gurobipy import GRB
 # Define constants
 numPlayers = 10
 base_salary = 10
-education_cost_coefficient = 15
-c = 10
-d = 1
+education_cost_coefficient = 12
+c = 1
+d = 0.1
 
 # Definition of base functions
 
@@ -25,7 +25,7 @@ def salary_1_continuous(player_education, inv_avg_education):
     return base_salary * (1 + player_education * inv_avg_education)
 
 def salary_2(player_education, total_education) :
-    return base_salary * (c + player_education * player_education - d * total_education)
+    return base_salary * (c + player_education - d * total_education)
 
 def cost_of_education(education_level):
     return education_cost_coefficient * education_level
@@ -182,7 +182,7 @@ def best_response_dynamics(iterations, type, salary_version):
 
 # Run the dynamics
 iterations = 25
-history = best_response_dynamics(iterations, "continuous", 2)
+history = best_response_dynamics(iterations, "discrete", 2)
 print("Final education levels:", history[iterations,:])
 print(history)
 
