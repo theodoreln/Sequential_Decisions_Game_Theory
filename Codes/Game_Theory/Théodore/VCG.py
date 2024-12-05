@@ -56,12 +56,15 @@ def Profit(i, alpha, beta, alpha_bid, beta_bid):
 def iterate_profit(i, alpha, beta, alpha_bid, beta_bid):
     # 2D array to store the profit of the player i
     profit = np.zeros((21, 20))
+    # Copy of the alpha and beta bids
+    alpha_bid_copy = alpha_bid.copy()
+    beta_bid_copy = beta_bid.copy()
     # Iterate on the alpha and beta values
     for j in range(21):
         for k in range(20):
-            alpha_bid[i] = j * 0.5
-            beta_bid[i] =  0.05 + k * 0.05
-            profit[j, k] = Profit(i, alpha, beta, alpha_bid, beta_bid)
+            alpha_bid_copy[i] = j * 0.5
+            beta_bid_copy[i] =  0.05 + k * 0.05
+            profit[j, k] = Profit(i, alpha, beta, alpha_bid_copy, beta_bid_copy)
     
     # Plot this profit array in a 3D plot
     fig = plt.figure()
@@ -92,10 +95,8 @@ if __name__ == "__main__":
     # Demand of the market
     xD = 20
     # Player i
-    i = 0
+    i = 3
     
-    # Compute the optimal production levels
-    print(optimal_production_levels(alpha_bid, beta_bid))
     # Compute the profit of the player i
     print(Profit(i, alpha, beta, alpha_bid, beta_bid))
     # Show profit of player 0 with iterate_profit
@@ -106,3 +107,6 @@ if __name__ == "__main__":
     alpha_sol = argmax // 20 * 0.5
     beta_sol = 0.05 + argmax % 20 * 0.05
     print(f"Player {i+1} - Optimal alpha: {alpha_sol}, optimal beta: {beta_sol} - Profit : {profit[argmax // 20, argmax % 20]}")
+    
+    # Compute the optimal production levels
+    print("Optimal production level", optimal_production_levels(alpha_bid, beta_bid))
