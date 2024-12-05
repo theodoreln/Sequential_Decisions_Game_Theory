@@ -60,7 +60,7 @@ A **Congestion Game** is a type of game in game theory where players compete for
 
 **Best Response Dynamics** refers to an iterative process where **players update their strategies by choosing their best response to the current strategies of other players**. Players take turns updating their strategy. A player’s best response is the strategy that maximizes their payoff given the strategies chosen by others. This process continues until no player wants to change their strategy, resulting in a Nash equilibrium. In congestion games (and potential games), **best response dynamics are guaranteed to converge to a Nash equilibrium** because the game has a potential function that strictly increases or decreases with each player's improvement. https://en.wikipedia.org/wiki/Best_response
 
-(There is a special class of congestion games called **Singleton Congestion Games** for which the **Social Welfare (SW)** function can act as a Potential Function under specific conditions. In a Singleton Congestion Game, each player's strategy is restricted to choosing a single resource from a set (instead of subsets or combinations of resources). https://en.wikipedia.org/wiki/Potential_game) ?????
+There is a special class of congestion games for which the **Social Welfare (SW)** function can act as a Potential Function under specific conditions. This condition is linearity ? Or convexity ? https://en.wikipedia.org/wiki/Potential_game
 
 ## Stackelberg Games
 
@@ -166,9 +166,6 @@ A **MDP** models a **single decision-maker** (an agent) interacting with an envi
   - Combines the state-dependent dynamics of MDPs with strategic interactions of repeated games.
   - Players interact both strategically (against each other) and dynamically (via the environment).
 
-https://en.wikipedia.org/wiki/Partially_observable_Markov_decision_process
+**Partially Observable** means that we can't have a direct access to the state of the system but only observations of the system. And those observations will also evolve with our decision via a transition function.
 
-![alt text](image.png)
-![alt text](image-1.png)
-![alt text](image-2.png)
-![alt text](image-3.png)
+https://en.wikipedia.org/wiki/Partially_observable_Markov_decision_process
