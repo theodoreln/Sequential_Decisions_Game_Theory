@@ -180,3 +180,5 @@ plt.xlabel("Iteration")
 plt.ylabel("Regret")
 plt.legend()
 plt.show()
+
+# 75 for regret matching, 200 for fictitious play, 350 for multiplicative weights
