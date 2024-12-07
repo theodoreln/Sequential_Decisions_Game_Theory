@@ -5,7 +5,7 @@ import numpy as np
 # Function to take the best decision
 def Policy_DP(n,base_salary, base_education, expenses, education_rate, max_education, gamma, ret, proba) :
     # Creating array V with random values
-    V_array = np.random.uniform(0, ret(max_education, 0), (n,max_education+1-base_education))
+    V_array = np.zeros((n,max_education+1-base_education))
 
     # Recursion to repeat computation of V
     for i in range(n-1, -1, -1) :
