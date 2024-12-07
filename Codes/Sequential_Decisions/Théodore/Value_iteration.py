@@ -15,12 +15,12 @@ def Policy_Value_iteration(n,base_salary, base_education, expenses, education_ra
         V_new = np.zeros((n,max_education+1-base_education))
         cond_sum = 0
         for i in range(n-1, -1, -1) :
-            for j in range(max_education, -1, -1) :
+            for j in range(max_education - base_education, -1, -1) :
                 if i == n-1 :
-                    V_new[i,j] = max([ret(j,0), ret(j,1)])
+                    V_new[i,j] = max([ret(j+base_education,0), ret(j+base_education,1)])
                 else :
-                    V_new[i,j] = max([ret(j,0) + gamma * sum([proba(l,j,0)*V_array[i+1,l] for l in range(j,min(max_education,j+2)+1)]), 
-                                    ret(j,1) + gamma * sum([proba(l,j,1)*V_array[i+1,l] for l in range(j,min(max_education,j+3)+1)])])
+                    V_new[i,j] = max([ret(j+base_education,0) + gamma * sum([proba(l,j,0)*V_array[i+1,l] for l in range(j,max_education-base_education+1)]), 
+                                    ret(j+base_education,1) + gamma * sum([proba(l,j,1)*V_array[i+1,l] for l in range(j,max_education-base_education+1)])])
                 cond_sum += (V_array[i,j] - V_new[i,j])
         V_array = V_new.copy()
         if cond_sum == 0 :
@@ -29,13 +29,13 @@ def Policy_Value_iteration(n,base_salary, base_education, expenses, education_ra
     # Creating array Q and recursion to fill it
     Q_array = np.zeros((n,max_education+1-base_education,2))
     for i in range(n-1, -1, -1) :
-            for j in range(max_education, -1, -1) :
+            for j in range(max_education-base_education, -1, -1) :
                 if i == n-1 :
-                    Q_array[i,j,0] = ret(j,0)
-                    Q_array[i,j,1] = ret(j,1)
+                    Q_array[i,j,0] = ret(j+base_education,0)
+                    Q_array[i,j,1] = ret(j+base_education,1)
                 else :
-                    Q_array[i,j,0] = ret(j,0) + gamma * sum([proba(l,j,0)*V_array[i+1,l] for l in range(j,min(max_education,j+2)+1)])
-                    Q_array[i,j,1] = ret(j,1) + gamma * sum([proba(l,j,1)*V_array[i+1,l] for l in range(j,min(max_education,j+2)+1)])
+                    Q_array[i,j,0] = ret(j+base_education,0) + gamma * sum([proba(l,j,0)*V_array[i+1,l] for l in range(j,max_education-base_education+1)])
+                    Q_array[i,j,1] = ret(j+base_education,1) + gamma * sum([proba(l,j,1)*V_array[i+1,l] for l in range(j,max_education-base_education+1)])
                     
     # Best_dec array
     Best_dec = np.argmax(Q_array, axis=2)
@@ -46,7 +46,7 @@ def Policy_Value_iteration(n,base_salary, base_education, expenses, education_ra
 if __name__ == "__main__":
     ### Parameters 
     # Numbers of periods
-    n = 20
+    n = 10
     # Base salary
     base_salary = 1
     # Base Education
@@ -58,7 +58,7 @@ if __name__ == "__main__":
     # Education Rate
     education_rate = 2
     # Max education
-    max_education = base_education + n * 2
+    max_education = base_education + n * education_rate
     # Discount factor
     gamma = 0.95
     
@@ -95,7 +95,7 @@ if __name__ == "__main__":
         plt.imshow(data, cmap=cmap, aspect='auto')
         # Set the ticks for both x and y axes to be integers
         plt.xticks(np.arange(data.shape[1]), np.arange(1, data.shape[1]+1))
-        plt.yticks(np.arange(data.shape[0]), np.arange(1, data.shape[0]+1))
+        plt.yticks(np.arange(data.shape[0]), np.arange(base_education, base_education + data.shape[0]))
         # Add grid lines (around each square)
         plt.gca().set_xticks(np.arange(-0.5, data.shape[1], 1), minor=True)
         plt.gca().set_yticks(np.arange(-0.5, data.shape[0], 1), minor=True)
