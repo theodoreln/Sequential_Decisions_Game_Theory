@@ -15,21 +15,21 @@ def Policy_Policy_iteration(n,base_salary, base_education, expenses, education_r
     while cond != 1 :
         cond_sum = 0
         for i in range(n-1, -1, -1) :
-            for j in range(max_education, -1, -1) :
+            for j in range(max_education - base_education, -1, -1) :
                 if i == n-1 :
-                    V_array[i,j] = ret(j,Best_dec[i,j])
+                    V_array[i,j] = ret(j+base_education,Best_dec[i,j])
                 else :
-                    V_array[i,j] = ret(j,Best_dec[i,j]) + gamma * sum([proba(l,j,Best_dec[i,j])*V_array[i+1,l] for l in range(j,min(max_education,j+2)+1)])
+                    V_array[i,j] = ret(j+base_education,Best_dec[i,j]) + gamma * sum([proba(l,j,Best_dec[i,j])*V_array[i+1,l] for l in range(j,max_education-base_education+1)])
         Best_new = np.zeros((n,max_education+1-base_education))
         for i in range(n-1, -1, -1) :
-            for j in range(max_education, -1, -1) :
+            for j in range(max_education - base_education, -1, -1) :
                 if i == n-1 :
-                    if ret(j,0) > ret(j,1) :
+                    if ret(j+base_education,0) > ret(j+base_education,1) :
                         Best_new[i,j] = 0
                     else :
                         Best_new[i,j] = 1
                 else :
-                    if (ret(j,0) + gamma * sum([proba(l,j,0)*V_array[i+1,l] for l in range(j,min(max_education,j+2)+1)])) > (ret(j,1) + gamma * sum([proba(l,j,1)*V_array[i+1,l] for l in range(j,min(max_education,j+2)+1)])) :
+                    if (ret(j+base_education,0) + gamma * sum([proba(l,j,0)*V_array[i+1,l] for l in range(j,max_education-base_education+1)])) > (ret(j+base_education,1) + gamma * sum([proba(l,j,1)*V_array[i+1,l] for l in range(j,max_education-base_education+1)]) ) :
                         Best_new[i,j] = 0
                     else :
                         Best_new[i,j] = 1
@@ -45,7 +45,7 @@ def Policy_Policy_iteration(n,base_salary, base_education, expenses, education_r
 if __name__ == "__main__":
     ### Parameters 
     # Numbers of periods
-    n = 20
+    n = 10
     # Base salary
     base_salary = 1
     # Base Education
@@ -94,7 +94,7 @@ if __name__ == "__main__":
         plt.imshow(data, cmap=cmap, aspect='auto')
         # Set the ticks for both x and y axes to be integers
         plt.xticks(np.arange(data.shape[1]), np.arange(1, data.shape[1]+1))
-        plt.yticks(np.arange(data.shape[0]), np.arange(1, data.shape[0]+1))
+        plt.yticks(np.arange(data.shape[0]), np.arange(base_education, base_education + data.shape[0]))
         # Add grid lines (around each square)
         plt.gca().set_xticks(np.arange(-0.5, data.shape[1], 1), minor=True)
         plt.gca().set_yticks(np.arange(-0.5, data.shape[0], 1), minor=True)
