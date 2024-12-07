@@ -67,7 +67,7 @@ def Policy_LP(n,base_salary, base_education, expenses, education_rate, max_educa
 if __name__ == "__main__":
     ### Parameters 
     # Numbers of periods
-    n = 20
+    n = 10
     # Base salary
     base_salary = 1
     # Base Education
@@ -79,7 +79,7 @@ if __name__ == "__main__":
     # Education Rate
     education_rate = 2
     # Max education
-    max_education = base_education + n * 2
+    max_education = base_education + n * education_rate
     # Discount factor
     gamma = 0.95
     
@@ -116,7 +116,7 @@ if __name__ == "__main__":
         plt.imshow(data, cmap=cmap, aspect='auto')
         # Set the ticks for both x and y axes to be integers
         plt.xticks(np.arange(data.shape[1]), np.arange(1, data.shape[1]+1))
-        plt.yticks(np.arange(data.shape[0]), np.arange(1, data.shape[0]+1))
+        plt.yticks(np.arange(data.shape[0]), np.arange(base_education, base_education + data.shape[0]))
         # Add grid lines (around each square)
         plt.gca().set_xticks(np.arange(-0.5, data.shape[1], 1), minor=True)
         plt.gca().set_yticks(np.arange(-0.5, data.shape[0], 1), minor=True)
