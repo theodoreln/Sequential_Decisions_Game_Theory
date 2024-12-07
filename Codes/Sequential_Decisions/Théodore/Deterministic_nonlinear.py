@@ -6,7 +6,7 @@ import matplotlib.pyplot as plt
 
 ### Parameters 
 # Numbers of periods
-n = 20
+n = 10
 # Base salary
 base_salary = 1
 # Base Education
@@ -88,10 +88,10 @@ print(education)
 time = list(range(n))
 
 # Create the plot
-plt.plot(time, work, label="Work")
-plt.plot(time, study, label="Study")
-plt.plot(time, money, label="Money")
-plt.plot(time, education, label="Education")
+plt.plot(time, work, label="Work", marker='o')
+plt.plot(time, study, label="Study", marker='s')
+plt.plot(time, money, label="Money", marker='^')
+plt.plot(time, education, label="Education", marker='x')
 
 # Display the plot
 plt.xlabel('Time')
